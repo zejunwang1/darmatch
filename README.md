@@ -178,6 +178,7 @@ print(word_list)
 运行结果如下：
 
 ```
+The Chinese word segmentation based on Maximum Forward Matching:
 [(0, '俄罗斯联邦'), (5, '总统'), (7, '普京'), (9, '决定'), (11, '在'), (12, '顿巴斯地区'), (17, '开展'), (19, '特别'), (21, '军事行动'), (25, '。')]
 The Chinese word segmentation based on Maximum Backward Matching:
 [(0, '俄罗斯'), (3, '联邦总统'), (7, '普京'), (9, '决定'), (11, '在'), (12, '顿巴斯地区'), (17, '开展'), (19, '特别'), (21, '军事行动'), (25, '。')]
