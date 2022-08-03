@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
 git clone https://github.com/zejunwang1/darmatch
 cd darmatch
 mkdir build
+cd build/
 cmake ..
 # cmake -DUSE_PREFIX_TRIE=ON ..
 make
