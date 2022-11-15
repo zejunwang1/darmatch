@@ -32,14 +32,26 @@ PYBIND11_MODULE(darmatch_pybind, m) {
       .def("insert", 
             (void (darmatch::DarMatch::*)(const std::string&))(&darmatch::DarMatch::insert), 
             py::arg("word"))
-
+      
+      .def("index",
+            (int (darmatch::DarMatch::*)(const std::string&))(&darmatch::DarMatch::index),
+            py::arg("word"))
+      
+      .def("count",
+            (bool (darmatch::DarMatch::*)(const std::string&))(&darmatch::DarMatch::count),
+            py::arg("word"))
+      
+      .def("keys",
+            (std::string (darmatch::DarMatch::*)(int))(&darmatch::DarMatch::keys),
+            py::arg("id"))
+      
       .def("seg_text", 
             (std::vector<std::pair<size_t, std::string>>(darmatch::DarMatch::*)(const std::string&, bool, int))(&darmatch::DarMatch::seg),
-            py::arg("text"), py::arg("forward") = true, py::arg("max_prefix_matches") = 1024)
+            py::arg("text"), py::arg("forward") = true, py::arg("max_prefix_matches") = 128)
       
       .def("parse_text",
             (std::vector<std::pair<size_t, std::string>>(darmatch::DarMatch::*)(const std::string&, int))(&darmatch::DarMatch::parse),
-            py::arg("text"), py::arg("max_prefix_matches") = 1024); 
+            py::arg("text"), py::arg("max_prefix_matches") = 128); 
 }
 
 
