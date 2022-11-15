@@ -58,10 +58,11 @@ class DarMatch {
         }
       }
 
-      std::sort(_keys.begin(), _keys.end());
-      _keys.erase(std::unique(_keys.begin(), _keys.end()), _keys.end());
+      //std::sort(_keys.begin(), _keys.end());
+      //_keys.erase(std::unique(_keys.begin(), _keys.end()), _keys.end());
       _size = _keys.size();
       std::vector<const char*> keys;
+      keys.reserve(_size);
       for (size_t i = 0; i < _keys.size(); i++) {
         keys.emplace_back(_keys[i].c_str());
       }
@@ -91,8 +92,15 @@ class DarMatch {
     }
     
     void insert(const std::string& word) {
-      insert(word.c_str());
-    }  
+      size_t len = word.size();
+      auto data = word.c_str();
+      auto result_pair = _da->exactMatchSearch<dar::result_pair_type>(data, len);
+      if (result_pair.value < 0) {
+        _da->update(data, len, _size++);
+        _keys.emplace_back(word);
+        _max_word_len = (_max_word_len > len) ? _max_word_len : len;
+      }
+    }   
 
     void insert(const char* word) {
       insert(word, std::strlen(word));
@@ -103,17 +111,33 @@ class DarMatch {
       _da->exactMatchSearch(word, len, result_pair);
       if (result_pair.value < 0) {
         _da->update(word, len, _size++);
-        _keys.emplace_back(std::string(word, len));
+        _keys.emplace_back(word, len);
         _max_word_len = (_max_word_len > len) ? _max_word_len : len;
       }
     }
+
+    int index(const std::string& word) {
+      auto result_pair = _da->exactMatchSearch<dar::result_pair_type>(word.c_str(), word.size());
+      return result_pair.value;
+    }
+   
+    bool count(const std::string& word) {
+      if (index(word) < 0)  { return false; }
+      return true; 
+    }
     
-    void maximum_forward_matching(const char* str, std::vector<int>& index,
-      std::vector<std::pair<size_t, size_t>>& poslen, int max_prefix_matches = 1024) {
+    std::string keys(int id) {
+      assert(id >= 0);
+      assert(id < _size);
+      return _keys[id];
+    }
+    
+    void maximum_forward_matching(const char* str, size_t len, std::vector<int>& index,
+      std::vector<std::pair<size_t, size_t>>& poslen, int max_prefix_matches = 128) {
       if (index.size()) { index.clear(); }
       if (poslen.size())  { poslen.clear(); }
       int state = 1;
-      size_t i = 0, bpos = 0, tlen = std::strlen(str);
+      size_t i = 0, bpos = 0, tlen = len;
       std::vector<dar::result_pair_type> result_pairs(max_prefix_matches);
       while (bpos < tlen) {
         size_t num = _da->commonPrefixSearch(str + bpos, &(result_pairs[0]), max_prefix_matches, tlen - bpos);
@@ -191,14 +215,14 @@ class DarMatch {
       return true;
     }
 
-    void maximum_backward_matching(const char* str, std::vector<int>& index,
+    void maximum_backward_matching(const char* str, size_t slen, std::vector<int>& index,
       std::vector<std::pair<size_t, size_t>>& poslen) {
       if (index.size()) { index.clear(); }
       if (poslen.size())  { poslen.clear(); }
       std::vector<int> index0;
       std::vector<std::pair<size_t, size_t>> poslen0;
 
-      int epos = std::strlen(str);
+      int epos = slen;
       int bpos = epos - _max_word_len - 1;
       if (epos < 1) { return; }
       if (bpos >= 0) {
@@ -269,29 +293,29 @@ class DarMatch {
     }
     
     void seg(const std::string& text, std::vector<std::pair<size_t, std::string>>& words,
-      bool forward = true, int max_prefix_matches = 1024) {
+      bool forward = true, int max_prefix_matches = 128) {
       if (words.size()) { words.clear(); }
       std::vector<int> index;
       std::vector<std::pair<size_t, size_t>> poslen;
       if (forward) {
-        maximum_forward_matching(text.c_str(), index, poslen, max_prefix_matches);
+        maximum_forward_matching(text.c_str(), text.size(), index, poslen, max_prefix_matches);
       } else {
-        maximum_backward_matching(text.c_str(), index, poslen);
+        maximum_backward_matching(text.c_str(), text.size(), index, poslen);
       }
       for (size_t i = 0; i < poslen.size(); i++) {
         words.emplace_back(poslen[i].first, text.substr(poslen[i].first, poslen[i].second));
       }
     }
     
-    std::vector<std::pair<size_t, std::string>> seg(const std::string& text, bool forward = true, int max_prefix_matches = 1024) {
+    std::vector<std::pair<size_t, std::string>> seg(const std::string& text, bool forward = true, int max_prefix_matches = 128) {
       std::vector<std::pair<size_t, std::string>> words;
       seg(text, words, forward, max_prefix_matches);
       return words;
     }
     
-    std::vector<std::pair<size_t, std::string>> parse(const std::string& text, int max_prefix_matches = 1024) {
+    std::vector<std::pair<size_t, std::string>> parse(const std::string& text, int max_prefix_matches = 128) {
       const char* str = text.c_str();
-      size_t bpos = 0, tlen = std::strlen(str);
+      size_t bpos = 0, tlen = text.size();
       std::vector<std::pair<size_t, std::string>> matches;
       std::vector<dar::result_pair_type> result_pairs(max_prefix_matches);
       while (bpos < tlen) {
