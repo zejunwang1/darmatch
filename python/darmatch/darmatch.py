@@ -24,6 +24,15 @@ class DarMatch(object):
     
     def insert(self, word: str):
         self.dar.insert(word)
+    
+    def index(self, word: str):
+        return self.dar.index(word)
+    
+    def count(self, word: str):
+        return self.dar.count(word)
+    
+    def keys(self, id: int):
+        return self.dar.keys(id)
 
     def seg(self, 
             text: str, 
