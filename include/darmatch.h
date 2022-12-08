@@ -138,7 +138,8 @@ class DarMatch {
       if (poslen.size())  { poslen.clear(); }
       int state = 1;
       size_t i = 0, bpos = 0, tlen = len;
-      std::vector<dar::result_pair_type> result_pairs(max_prefix_matches);
+      std::vector<dar::result_pair_type> result_pairs;
+      result_pairs.reserve(max_prefix_matches);
       while (bpos < tlen) {
         size_t num = _da->commonPrefixSearch(str + bpos, &(result_pairs[0]), max_prefix_matches, tlen - bpos);
         if (num < 1) {
@@ -159,7 +160,7 @@ class DarMatch {
             poslen.emplace_back(i, bpos - i);
             index.emplace_back(-1);
           }
-          num = (num < result_pairs.size()) ? num : result_pairs.size();
+          num = (num < max_prefix_matches) ? num : max_prefix_matches;
           const dar::result_pair_type& result_pair = result_pairs[num - 1];
           poslen.emplace_back(bpos, result_pair.length);
           index.emplace_back(result_pair.value);
