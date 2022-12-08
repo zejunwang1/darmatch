@@ -317,10 +317,11 @@ class DarMatch {
       const char* str = text.c_str();
       size_t bpos = 0, tlen = text.size();
       std::vector<std::pair<size_t, std::string>> matches;
-      std::vector<dar::result_pair_type> result_pairs(max_prefix_matches);
+      std::vector<dar::result_pair_type> result_pairs;
+      result_pairs.reserve(max_prefix_matches);
       while (bpos < tlen) {
         size_t num = _da->commonPrefixSearch(str + bpos, &(result_pairs[0]), max_prefix_matches, tlen - bpos);
-        for (size_t i = 0; i < num && i < result_pairs.size(); i++) {
+        for (size_t i = 0; i < num && i < max_prefix_matches; i++) {
           const dar::result_pair_type& result_pair = result_pairs[i];
           matches.emplace_back(bpos, _keys[result_pair.value]);
         }
