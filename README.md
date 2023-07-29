@@ -133,7 +133,7 @@ The result of multi-pattern string matching:
 
 ### Installation
 
-通过 pip 命令直接安装：
+通过 pip 命令安装：
 
 ```shell
 pip install git+https://github.com/zejunwang1/darmatch
