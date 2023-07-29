@@ -136,7 +136,7 @@ The result of multi-pattern string matching:
 通过 pip 命令直接安装：
 
 ```shell
-pip install darmatch
+pip install git+https://github.com/zejunwang1/darmatch
 ```
 
 或者从 github 仓库中获取最新版本安装：
